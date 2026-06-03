@@ -1,0 +1,7 @@
+{
+  "commitAll": true,
+  "sign": true,
+  "scripts": {
+    "postbump": "./scripts/sync-plugin-version.sh"
+  }
+}
