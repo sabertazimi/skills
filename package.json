@@ -1,0 +1,33 @@
+{
+  "name": "skills",
+  "type": "module",
+  "version": "1.0.0",
+  "packageManager": "pnpm@11.5.0",
+  "description": "Personal agent plugin marketplace",
+  "author": "sabertazimi <sabertazimi@gmail.com",
+  "license": "MIT",
+  "homepage": "https://github.com/sabertazimi/skills",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sabertazimi/skills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sabertazimi/skills/issues"
+  },
+  "keywords": [
+    "AI",
+    "LLM",
+    "Claude",
+    "Claude Code",
+    "Agent",
+    "Coding Agent",
+    "Skills"
+  ],
+  "scripts": {
+    "changeset": "commit-and-tag-version --dry-run -s",
+    "release": "commit-and-tag-version -s"
+  },
+  "devDependencies": {
+    "commit-and-tag-version": "^12.7.3"
+  }
+}
