@@ -25,11 +25,30 @@ jobs:
         run: |
           git ls-files "*.sh" | xargs shellcheck
 
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup Bats
+        id: setup-bats
+        uses: bats-core/bats-action@4.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          support-path: "${{ github.workspace }}/test/bats-support"
+          assert-path: "${{ github.workspace }}/test/bats-assert"
+      - name: Run Bats tests
+        shell: bash
+        env:
+          BATS_LIB_PATH: ${{ steps.setup-bats.outputs.lib-path }}
+        run: bats test/
+
   publish:
     name: Publish
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
-    needs: [lint]
+    needs: [lint, test]
     permissions:
       contents: write
     steps:
