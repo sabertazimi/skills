@@ -67,8 +67,15 @@ run_notify() {
 }
 
 @test "jq missing: fallback path for Stop event" {
-    # Remove jq from PATH by using a dir with no jq
-    PATH="${BATS_TEST_TMPDIR}/bin"
+    # Remove jq by filtering it out of PATH, keep fake notify-send
+    local no_jq_path=""
+    local IFS=':'
+    for dir in $PATH; do
+        if [ ! -x "${dir}/jq" ]; then
+            no_jq_path="${no_jq_path:+$no_jq_path:}${dir}"
+        fi
+    done
+    PATH="$no_jq_path"
     export PATH
 
     : > "$NOTIFY_LOG"
@@ -80,7 +87,14 @@ run_notify() {
 }
 
 @test "jq missing: fallback path for Notification event" {
-    PATH="${BATS_TEST_TMPDIR}/bin"
+    local no_jq_path=""
+    local IFS=':'
+    for dir in $PATH; do
+        if [ ! -x "${dir}/jq" ]; then
+            no_jq_path="${no_jq_path:+$no_jq_path:}${dir}"
+        fi
+    done
+    PATH="$no_jq_path"
     export PATH
 
     : > "$NOTIFY_LOG"
