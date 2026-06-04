@@ -67,16 +67,11 @@ run_notify() {
 }
 
 @test "jq missing: fallback path for Stop event" {
-    # Remove jq by filtering it out of PATH, keep fake notify-send
-    local no_jq_path=""
-    local IFS=':'
-    for dir in $PATH; do
-        if [ ! -x "${dir}/jq" ]; then
-            no_jq_path="${no_jq_path:+$no_jq_path:}${dir}"
-        fi
-    done
-    PATH="$no_jq_path"
-    export PATH
+    # Build a minimal PATH: only fake bin (has notify-send), /usr/bin, /bin
+    # Exclude any directory containing jq (e.g. bats libs, /usr/local/bin)
+    local fake_bin="${BATS_TEST_TMPDIR}/bin"
+    local clean_path="${fake_bin}:/usr/bin:/bin"
+    export PATH="$clean_path"
 
     : > "$NOTIFY_LOG"
     run bash -c "printf '%s' '{\"hook_event_name\":\"Stop\",\"last_assistant_message\":\"ignored\"}' | '$NOTIFY_SH'"
@@ -87,15 +82,9 @@ run_notify() {
 }
 
 @test "jq missing: fallback path for Notification event" {
-    local no_jq_path=""
-    local IFS=':'
-    for dir in $PATH; do
-        if [ ! -x "${dir}/jq" ]; then
-            no_jq_path="${no_jq_path:+$no_jq_path:}${dir}"
-        fi
-    done
-    PATH="$no_jq_path"
-    export PATH
+    local fake_bin="${BATS_TEST_TMPDIR}/bin"
+    local clean_path="${fake_bin}:/usr/bin:/bin"
+    export PATH="$clean_path"
 
     : > "$NOTIFY_LOG"
     run bash -c "printf '%s' '{\"hook_event_name\":\"Notification\",\"message\":\"ignored\"}' | '$NOTIFY_SH'"
