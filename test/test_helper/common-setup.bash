@@ -4,7 +4,7 @@
 
 _common_setup() {
     # Point to the hooks directory
-    NOTIFY_SH="$(cd "$(dirname "$BATS_TEST_FILENAME")/../.." && pwd)/hooks/notify.sh"
+    NOTIFY_SH="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)/hooks/notify.sh"
 
     # Create a fake notify-send that logs arguments
     FAKE_BIN="${BATS_TEST_TMPDIR}/bin"
