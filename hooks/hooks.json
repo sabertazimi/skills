@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/notify.sh",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/notify.sh\" || true",
             "timeout": 10
           }
         ]
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/notify.sh",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/notify.sh\" || true",
             "timeout": 10
           }
         ]
