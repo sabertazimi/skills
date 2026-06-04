@@ -36,13 +36,13 @@ jobs:
         uses: bats-core/bats-action@4.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          support-path: "${{ github.workspace }}/test/bats-support"
-          assert-path: "${{ github.workspace }}/test/bats-assert"
+          support-path: "${{ github.workspace }}/tests/bats-support"
+          assert-path: "${{ github.workspace }}/tests/bats-assert"
       - name: Run Bats tests
         shell: bash
         env:
           BATS_LIB_PATH: ${{ steps.setup-bats.outputs.lib-path }}
-        run: bats test/
+        run: bats tests/
 
   publish:
     name: Publish
