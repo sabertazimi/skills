@@ -67,12 +67,9 @@ run_notify() {
 }
 
 @test "jq missing: fallback path for Stop event" {
-    # Create a fake jq that exits 127 (not found)
-    local fake_bin="${BATS_TEST_TMPDIR}/fakebin"
-    mkdir -p "$fake_bin"
-    printf '#!/bin/sh\nexit 127\n' > "$fake_bin/jq"
-    chmod +x "$fake_bin/jq"
-    PATH="$fake_bin:$PATH"
+    # Remove jq from PATH by using a dir with no jq
+    PATH="${BATS_TEST_TMPDIR}/bin"
+    export PATH
 
     : > "$NOTIFY_LOG"
     run bash -c "printf '%s' '{\"hook_event_name\":\"Stop\",\"last_assistant_message\":\"ignored\"}' | '$NOTIFY_SH'"
@@ -83,11 +80,8 @@ run_notify() {
 }
 
 @test "jq missing: fallback path for Notification event" {
-    local fake_bin="${BATS_TEST_TMPDIR}/fakebin"
-    mkdir -p "$fake_bin"
-    printf '#!/bin/sh\nexit 127\n' > "$fake_bin/jq"
-    chmod +x "$fake_bin/jq"
-    PATH="$fake_bin:$PATH"
+    PATH="${BATS_TEST_TMPDIR}/bin"
+    export PATH
 
     : > "$NOTIFY_LOG"
     run bash -c "printf '%s' '{\"hook_event_name\":\"Notification\",\"message\":\"ignored\"}' | '$NOTIFY_SH'"
@@ -142,19 +136,29 @@ run_notify() {
 }
 
 @test "Shell special characters in message" {
-    run_notify '{"hook_event_name":"Stop","last_assistant_message":"echo $HOME | grep test || true"}'
+    # Use heredoc to avoid shell expansion of $HOME inside double quotes
+    local json
+    json=$(cat << 'ENDJSON'
+{"hook_event_name":"Stop","last_assistant_message":"echo $HOME | grep test || true"}
+ENDJSON
+)
+    : > "$NOTIFY_LOG"
+    run bash -c "printf '%s' '$json' | '$NOTIFY_SH'"
     [ "$status" -eq 0 ]
     local log
     log="$(cat "$NOTIFY_LOG")"
-    [[ "$log" == *"echo $HOME | grep test || true"* ]]
+    [[ "$log" == *"echo \$HOME | grep test || true"* ]]
 }
 
 @test "Combining diacritical marks" {
-    run_notify '{"hook_event_name":"Stop","last_assistant_message":"éêẽ"}'
+    # jq -r preserves combining characters as-is (NFD), so match the same form
+    local msg='éêẽ'
+    run_notify "{\"hook_event_name\":\"Stop\",\"last_assistant_message\":\"${msg}\"}"
     [ "$status" -eq 0 ]
     local log
     log="$(cat "$NOTIFY_LOG")"
-    [[ "$log" == *"éêẽ"* ]]
+    # Match the NFD form that jq outputs
+    [[ "$log" == *"éêẽ"* ]]
 }
 
 @test "Mixed charset: all character types combined" {
